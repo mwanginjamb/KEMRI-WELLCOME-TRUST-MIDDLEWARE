@@ -6,8 +6,8 @@
  * Time: 4:09 PM
  */
 
-namespace frontend\models;
-use common\models\User;
+namespace app\models;
+use app\models\User;
 use Yii;
 use yii\base\Model;
 
@@ -48,6 +48,7 @@ class Leave extends Model
     public $Status;
     public $Approval_Entries;
     public $Leave_Allowance;
+    public $Rejection_Comments;
     public $isNewRecord;
 
     /*public function __construct(array $config = [])

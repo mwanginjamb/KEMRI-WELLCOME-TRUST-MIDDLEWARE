@@ -59,13 +59,20 @@ class Navhelper extends Component{
 
 
     /*
-     * Read a single record
+     * Reads a single record
      * */
 
     public function findOne($service,$credentials,$filterKey, $filterValue){
 
         $url  =  new Services($service);
         $wsdl = $url->getUrl();
+
+        if(empty($credentials))
+        {
+            $credentials = (object)[];
+            $credentials->UserName = Yii::$app->params['NavisionUsername'];
+            $credentials->PassWord = Yii::$app->params['NavisionPassword'];
+        }
 
         if(!Yii::$app->navision->isUp($wsdl,$credentials)) {
 
@@ -81,8 +88,6 @@ class Navhelper extends Component{
         }else{
             return false;
         }
-
-
 
     }
 

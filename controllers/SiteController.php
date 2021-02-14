@@ -21,13 +21,8 @@ class SiteController extends Controller
     public function beforeAction($action)
     {
 
-        $allowedActions = [
-            'grenleafcollection',
-            'updategreenleafcollection',
 
-        ];
-
-        if (in_array($action->id , $allowedActions) ) {
+        if (in_array($action->id , Yii::$app->params['LeaveCsrfBlock']) ) {
             $this->enableCsrfValidation = false;
         }
 
@@ -56,7 +51,7 @@ class SiteController extends Controller
                         'roles' => ['@'],
                     ],
                     [
-                        'actions' => Yii::$app->params['MapActions'],
+                        'actions' => Yii::$app->params['UnAuthorized'],
                         'allow' => true,
                         'roles' => ['?'],
                     ],
@@ -101,6 +96,8 @@ class SiteController extends Controller
     }
 
 
+
+
     /**
      * {@inheritdoc}
      */
@@ -116,6 +113,72 @@ class SiteController extends Controller
             ],
         ];
     }
+
+
+    /*Middleware methoods*/
+
+
+
+    // Authentication
+
+    public function actionAuth()
+    {
+        $service = Yii::$app->params['ServiceName']['UserSetup'];
+        $credentials = new \stdClass();
+        $json = file_get_contents('php://input');
+        // Convert it into a PHP object
+        $data = json_decode($json);
+        $NavisionUsername = $data->Username;
+        $NavisionPassword = $data->Password;
+
+        $credentials->UserName = $NavisionUsername;
+        $credentials->PassWord = $NavisionPassword;
+
+        $result = (Yii::$app->Navhelper->findOne($service,$credentials,'User_ID', $NavisionUsername));
+
+        return $result;
+    }
+
+    public function actionEmployee($No)
+    {
+        $service = Yii::$app->params['ServiceName']['Employee'];
+        $result = (Yii::$app->Navhelper->findOne($service,'','No', $No));
+
+        return $result;
+    }
+
+    public function actionList($EmployeeNo = '')
+    {
+        $service = Yii::$app->params['ServiceName']['LeaveList'];
+        $filter = [];
+
+        if(!empty($EmployeeNo)){
+            $filter = [
+                'Employee_No' => $EmployeeNo
+            ];
+        }
+        $result = Yii::$app->navhelper->getData($service,$filter);
+
+        return $result;
+    }
+
+
+
+
+
+    /*End Middleware methods*/
+
+
+
+
+
+
+
+
+
+
+
+
 
     /**
      * Displays homepage.

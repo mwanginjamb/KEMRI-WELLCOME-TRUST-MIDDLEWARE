@@ -5,13 +5,13 @@ return [
     'senderEmail' => 'noreply@example.com',
     'senderName' => 'Example.com mailer',
 
-    'NavisionUsername'=>'HP ELITEBOOK 840 G5',
-    'NavisionPassword'=>'@francis123#',
-    'AdPrefix' => 'FRANCIS\\',
+    'NavisionUsername'=> 'kwtrp\svc-hrmcn01', //'jkipkurgat',
+    'NavisionPassword'=> 'Admin@123', //'Pa55P0rt%',
+    'AdPrefix' => 'kwtrp\\',
 
-    'server'=>'francis',//'app-svr-dev.rbss.com',//Navision Server
-    'WebServicePort'=>'4047',//Nav server Port
-    'ServerInstance'=>'BC140',//Nav Server Instance
+    'server'=>'144.91.82.244',//'app-svr-dev.rbss.com',//Navision Server
+    'WebServicePort'=>'1247',//Nav server Port
+    'ServerInstance'=>'KEMRI',//Nav Server Instance
     'CompanyName'=>'KEMRI',//Nav Company,
     'DBCompanyName' => 'KEMRI$', //NAV DB PREFIX
 
@@ -32,8 +32,9 @@ return [
 
     'MapActions' => [
         'list',
-        'index',
-        'leave'
+        'leave',
+        'auth',
+        'employee',
     ],
 
     'LeaveCsrfBlock' => [
@@ -42,8 +43,13 @@ return [
         'create',
         'update',
         'view',
-        'auth'
-    ]
+        'auth',
+    ],
+
+    'UnAuthorized' => [
+        'index',
+        'list',
+    ],
 
 
 

@@ -2,9 +2,11 @@
 
 namespace app\controllers;
 
+use app\models\Leave;
 use Yii;
 use yii\filters\AccessControl;
 use yii\filters\ContentNegotiator;
+use yii\helpers\ArrayHelper;
 use yii\web\Controller;
 use yii\web\Response;
 use yii\filters\VerbFilter;
@@ -160,6 +162,82 @@ class SiteController extends Controller
         $result = Yii::$app->navhelper->getData($service,$filter);
 
         return $result;
+    }
+
+    public function actionEmployees(){
+        $service = Yii::$app->params['ServiceName']['Employees'];
+
+        $employees = \Yii::$app->navhelper->getData($service);
+        $data = [];
+        $i = 0;
+        if(is_array($employees)){
+
+            foreach($employees as  $emp){
+                $i++;
+                if(!empty($emp->Full_Name) && !empty($emp->No)){
+                    $data[] = [
+                        'No' => $emp->No,
+                        'Full_Name' => $emp->Full_Name
+                    ];
+                }
+
+            }
+        }
+
+        return $data;
+        // return ArrayHelper::map($data,'No','Full_Name');
+    }
+
+    public function actionLeaveTypes($gender = ''){
+        $service = Yii::$app->params['ServiceName']['LeaveTypesSetup']; //['leaveTypes'];
+        $filter = [];
+
+        $arr = [];
+        $i = 0;
+        $result = \Yii::$app->navhelper->getData($service,$filter);
+        foreach($result as $res)
+        {
+            if($res->Gender == 'Both' || $res->Gender == $gender )
+            {
+                ++$i;
+                $arr[] = [
+                    'Code' => $res->Code,
+                    'Description' => $res->Description
+                ];
+            }
+        }
+
+        return $arr;
+        //return ArrayHelper::map($arr,'Code','Description');
+    }
+
+
+
+    public function actionLeave()
+    {
+        $service = Yii::$app->params['ServiceName']['LeaveCard'];
+        $model = new Leave();
+        // Takes raw data from the request
+        $json = file_get_contents('php://input');
+        // Convert it into a PHP object
+        $data = json_decode($json);
+        // Get Record to Update
+
+        $refresh = Yii::$app->Navhelper->getData($service, ['Application_No' => $data->Weighment_No]);
+
+        //Load model with Line Data
+        if(!is_string($refresh)){ // Array of Object Was Returned
+
+            $model = Yii::$app->Navhelper->loadmodel($data,$model);
+            $model->Key = $refresh[0]->Key;
+
+            // Do actual update
+            $update = Yii::$app->Navhelper->updateData($service, $model);
+            return $update;
+        }else{ // Return Navision Error
+            return $refresh;
+        }
+
     }
 
 

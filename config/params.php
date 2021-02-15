@@ -27,7 +27,9 @@ return [
         'LeaveRecallList' => 'LeaveRecallList', // 50065
         'LeaveRecallCard' => 'LeaveRecallCard', // 50064
         'LeaveAttachments' => 'LeaveAttachments', //50031
-        'UserSetup' => 'UserSetup', //119
+        'UserSetup' => 'UserSetup', //119---
+        'Employees' => 'Employees',
+        'LeaveTypesSetup' => 'LeaveTypesSetup',
     ],
 
     'MapActions' => [
@@ -35,6 +37,8 @@ return [
         'leave',
         'auth',
         'employee',
+        'employees',
+        'leave-types'
     ],
 
     'LeaveCsrfBlock' => [
@@ -44,11 +48,17 @@ return [
         'update',
         'view',
         'auth',
+        'leave',
+        'leave-types',
     ],
 
     'UnAuthorized' => [
         'index',
         'list',
+        'leave',
+        'auth',
+        'employees',
+        'leave-types'
     ],
 
 

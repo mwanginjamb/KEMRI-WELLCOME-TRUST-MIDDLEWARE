@@ -227,7 +227,7 @@ class SiteController extends Controller
 
 
         //Initial request
-        if(!strlen(trim($data->Key)))
+        if(empty($data->Key))
         {
             $now = date('Y-m-d');
             $model->Leave_Code = 'Annual';
@@ -245,7 +245,9 @@ class SiteController extends Controller
         //Load model with Line Data
         if($refresh[0]->Key){ // Array of Object Was Returned
 
-          $ignore = ['End_Date','Total_No_Of_Days','Leave_balance','Half_Day_on_Start_Date','Half_Day_on_End_Date','Holidays','Weekend_Days','Days','Balance_After','Return_Date'];
+          $ignore = ['End_Date','Total_No_Of_Days','Leave_balance','Half_Day_on_Start_Date',
+              'Half_Day_on_End_Date','Holidays','Weekend_Days','Days',
+              'Balance_After','Return_Date','Leave_Type_Decription'];
 
            $model = Yii::$app->navhelper->loadmodel($data,$model,$ignore);
 

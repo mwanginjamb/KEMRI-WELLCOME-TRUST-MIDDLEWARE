@@ -7,6 +7,7 @@ use Yii;
 use yii\filters\AccessControl;
 use yii\filters\ContentNegotiator;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Html;
 use yii\web\Controller;
 use yii\web\Response;
 use yii\filters\VerbFilter;
@@ -130,33 +131,34 @@ class SiteController extends Controller
         $json = file_get_contents('php://input');
         // Convert it into a PHP object
         $data = json_decode($json);
-        $NavisionUsername = $data->Username;
+        $NavisionUsername = Yii::$app->params['AdPrefix'].$data->Username;
         $NavisionPassword = $data->Password;
 
         $credentials->UserName = $NavisionUsername;
         $credentials->PassWord = $NavisionPassword;
 
-        $result = (Yii::$app->Navhelper->findOne($service,$credentials,'User_ID', $NavisionUsername));
+
+        $result = (Yii::$app->navhelper->findOne($service,$credentials,'User_ID', $NavisionUsername));
 
         return $result;
     }
 
     public function actionEmployee($No)
     {
-        $service = Yii::$app->params['ServiceName']['Employee'];
-        $result = (Yii::$app->Navhelper->findOne($service,'','No', $No));
+        $service = Yii::$app->params['ServiceName']['Employees'];
+        $result = (Yii::$app->navhelper->findOne($service,'','No', $No));
 
         return $result;
     }
 
-    public function actionList($EmployeeNo = '')
+    public function actionList($EmpNo = '')
     {
         $service = Yii::$app->params['ServiceName']['LeaveList'];
         $filter = [];
 
-        if(!empty($EmployeeNo)){
+        if(!empty($EmpNo)){
             $filter = [
-                'Employee_No' => $EmployeeNo
+                'Employee_No' => $EmpNo
             ];
         }
         $result = Yii::$app->navhelper->getData($service,$filter);
@@ -213,31 +215,72 @@ class SiteController extends Controller
 
 
 
-    public function actionLeave()
+    public function actionLeave($Employee_No = "")
     {
         $service = Yii::$app->params['ServiceName']['LeaveCard'];
         $model = new Leave();
+
         // Takes raw data from the request
         $json = file_get_contents('php://input');
         // Convert it into a PHP object
         $data = json_decode($json);
-        // Get Record to Update
 
-        $refresh = Yii::$app->Navhelper->getData($service, ['Application_No' => $data->Weighment_No]);
 
-        //Load model with Line Data
-        if(!is_string($refresh)){ // Array of Object Was Returned
-
-            $model = Yii::$app->Navhelper->loadmodel($data,$model);
-            $model->Key = $refresh[0]->Key;
-
-            // Do actual update
-            $update = Yii::$app->Navhelper->updateData($service, $model);
-            return $update;
-        }else{ // Return Navision Error
-            return $refresh;
+        //Initial request
+        if(!strlen(trim($data->Key)))
+        {
+            $now = date('Y-m-d');
+            $model->Leave_Code = 'Annual';
+            $model->Start_Date = date('Y-m-d', strtotime($now.' + 1 days'));
+            $model->Employee_No = !empty($Employee_No)?$Employee_No:''; //Yii::$app->user->identity->{'Employee No_'};
+            $request = Yii::$app->navhelper->postData($service,$model);
+            return $request;
         }
 
+
+        // Get Record to Update
+
+        $refresh = Yii::$app->navhelper->getData($service, ['Application_No' => $data->Application_No]);
+
+        //Load model with Line Data
+        if($refresh[0]->Key){ // Array of Object Was Returned
+
+          $ignore = ['End_Date','Total_No_Of_Days','Leave_balance','Half_Day_on_Start_Date','Half_Day_on_End_Date','Holidays','Weekend_Days','Days','Balance_After','Return_Date'];
+
+           $model = Yii::$app->navhelper->loadmodel($data,$model,$ignore);
+
+            // Do actual update
+            $update = Yii::$app->navhelper->updateData($service, $model);
+
+            return $update;
+        }else{ // Return Navision Error
+
+            $refresh;
+        }
+
+    }
+
+
+    public function actionLeaveCard($No)
+    {
+        $service = Yii::$app->params['ServiceName']['LeaveCard'];
+        $result = Yii::$app->navhelper->findOne($service,'','Application_No', $No);
+        return $result;
+    }
+
+    public function actionSendForApproval($No)
+    {
+        $service = Yii::$app->params['ServiceName']['PortalFactory'];
+
+        $data = [
+            'applicationNo' => $No,
+            'sendMail' => 1,
+            'approvalUrl' => Html::encode(Yii::$app->urlManager->createAbsoluteUrl(['approvals/index'])),
+        ];
+
+
+        $result = Yii::$app->navhelper->PortalWorkFlows($service,$data,'IanSendLeaveForApproval');
+        return $result;
     }
 
 

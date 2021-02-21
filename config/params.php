@@ -15,7 +15,9 @@ return [
     'CompanyName'=>'KEMRI',//Nav Company,
     'DBCompanyName' => 'KEMRI$', //NAV DB PREFIX
 
-    'codeUnits' => [],
+    'codeUnits' => [
+        'PortalFactory', // 50062
+    ],
 
     'ServiceName'=>[
     	 /**************************Leave *************************************/
@@ -28,8 +30,10 @@ return [
         'LeaveRecallCard' => 'LeaveRecallCard', // 50064
         'LeaveAttachments' => 'LeaveAttachments', //50031
         'UserSetup' => 'UserSetup', //119---
-        'Employees' => 'Employees',
+        'Employees' => 'Employees',// 5201
         'LeaveTypesSetup' => 'LeaveTypesSetup',
+
+        'PortalFactory' => 'PortalFactory', //code unit 50062
     ],
 
     'MapActions' => [
@@ -38,7 +42,10 @@ return [
         'auth',
         'employee',
         'employees',
-        'leave-types'
+        'leave-types',
+        'leave-card',
+        'employee',
+        'send-for-approval'
     ],
 
     'LeaveCsrfBlock' => [
@@ -50,6 +57,7 @@ return [
         'auth',
         'leave',
         'leave-types',
+        'leave-card'
     ],
 
     'UnAuthorized' => [
@@ -58,7 +66,10 @@ return [
         'leave',
         'auth',
         'employees',
-        'leave-types'
+        'leave-types',
+        'leave-card',
+        'employee',
+        'send-for-approval'
     ],
 
 
